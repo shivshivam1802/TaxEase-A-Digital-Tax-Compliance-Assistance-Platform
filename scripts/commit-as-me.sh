@@ -29,3 +29,15 @@ if [[ "${1:-}" == "-m" || "${1:-}" == "--message" ]]; then
 else
   git -c "user.name=$AUTHOR_NAME" -c "user.email=$AUTHOR_EMAIL" commit -m "$*"
 fi
+
+# Cursor may append Co-authored-by after git hooks. Strip it and reset identity.
+body="$(git log -1 --format='%B')"
+if echo "$body" | grep -q -E '^Co-authored-by:' || \
+   [[ "$(git log -1 --format='%an')" != "$AUTHOR_NAME" ]]; then
+  tmp="$(mktemp)"
+  printf '%s\n' "$body" | grep -v -E '^Co-authored-by:|^Signed-off-by: Cursor|^Made-with: Cursor' > "$tmp"
+  export SKIP_AUTHOR_FIX=1
+  git -c "user.name=$AUTHOR_NAME" -c "user.email=$AUTHOR_EMAIL" \
+    commit --amend --no-verify --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" --file="$tmp"
+  rm -f "$tmp"
+fi
