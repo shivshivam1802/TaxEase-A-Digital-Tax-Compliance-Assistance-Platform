@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-import { benefits } from "@/lib/site";
+import { benefits, site } from "@/lib/site";
 
 export function Benefits() {
   return (
@@ -12,7 +12,7 @@ export function Benefits() {
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium tracking-[0.18em] text-primary uppercase">
-            Why Niyam
+            Why {site.name}
           </p>
           <h2
             id="benefits-heading"

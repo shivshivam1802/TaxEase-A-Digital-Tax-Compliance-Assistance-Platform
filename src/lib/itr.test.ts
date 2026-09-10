@@ -115,7 +115,7 @@ test("checklist requires PAN, 26AS, bank proof, and Form 16 for salary", () => {
   assert.ok(result.items.some((item) => item.id === "form16" && !item.met));
 });
 
-test("local acknowledgement is a Niyam pack id, not a CPC token", () => {
+test("local acknowledgement is a TaxEase pack id, not a CPC token", () => {
   const ack = localAcknowledgement(new Date("2026-09-10T10:00:00.000Z"));
-  assert.match(ack, /^NIYAM-20260910-[0-9A-F]+$/);
+  assert.match(ack, /^TAXEASE-20260910-[0-9A-F]+$/);
 });

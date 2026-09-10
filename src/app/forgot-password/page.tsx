@@ -7,7 +7,7 @@ import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
   title: "Forgot password",
-  description: "Generate a local password reset link for your Niyam account.",
+  description: "Generate a local password reset link for your TaxEase account.",
 };
 
 export default function ForgotPasswordPage() {

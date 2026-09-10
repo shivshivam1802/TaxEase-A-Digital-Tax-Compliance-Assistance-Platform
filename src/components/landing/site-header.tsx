@@ -16,7 +16,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/brand/logo";
-import { navItems } from "@/lib/site";
+import { navItems, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
@@ -147,7 +147,7 @@ export function SiteHeader() {
             <SheetHeader>
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">
-                Jump to a section or sign in to Niyam.
+                Jump to a section or sign in to {site.name}.
               </SheetDescription>
               <Logo href="/" />
             </SheetHeader>

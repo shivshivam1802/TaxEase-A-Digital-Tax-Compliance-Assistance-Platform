@@ -26,8 +26,11 @@ export function Hero() {
             id="hero-heading"
             className="font-heading text-[2.35rem] leading-[1.12] font-medium tracking-tight text-balance text-foreground sm:text-5xl lg:text-[3.35rem]"
           >
-            Tax compliance without the scramble.
+            {site.name}
           </h1>
+          <p className="mt-3 font-heading text-xl font-medium tracking-tight text-foreground sm:text-2xl">
+            {site.tagline}
+          </p>
           <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
             {site.name} brings income tax, ITR assistance, TDS, documents, and
             due dates into one workspace — so filing season is a review, not a
@@ -96,10 +99,10 @@ function HeroPreview() {
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              FY 2025–26 overview
+              FY 2026–27 overview
             </p>
             <p className="mt-1 font-heading text-lg text-foreground">
-              Priya Sharma · Individual
+              Afnan Tufail · Individual
             </p>
           </div>
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">

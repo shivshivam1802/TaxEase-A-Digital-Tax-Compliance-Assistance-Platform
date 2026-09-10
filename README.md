@@ -1,8 +1,8 @@
-# Niyam
+# TaxEase
 
-Niyam is a tax compliance platform for individuals and small businesses in India.
+**TaxEase – A Digital Tax Compliance Assistance Platform** for individuals and small businesses in India.
 
-This repository ships the full first product slice: landing, authentication, dashboard, tax calculator, TDS ledger, ITR assistant, document vault, compliance calendar, CA desk, and settings.
+This repository ships the first product slice: landing, authentication, dashboard, tax calculator, TDS ledger, ITR assistant, document vault, compliance calendar, CA desk, and settings.
 
 ## What is live
 
@@ -18,11 +18,11 @@ This repository ships the full first product slice: landing, authentication, das
 - TDS ledger: credit vs tax you deducted, section codes, deposits, quarterly 26Q / 24Q
 - ITR assistant: form recommendation (ITR-1/2/3/4), document checklist, bank details, local filing pack (not a CPC submission)
 - Document vault: categorise, search, attach files up to 750 KB, download
-- Calendar: advance tax, ITR, TDS dates, plus personal reminders
+- Calendar: advance tax, ITR, and TDS dates, plus personal reminders
 - CA desk: request a consultation, share/revoke this year’s file, track status
 - Settings: profile (PAN / mobile), password, JSON export, delete account
 
-All tax and account data stays in this browser (`niyam.users.v1`, `niyam.session.v1`, `niyam.tax.v1`).
+Tax and account data stays in this browser (`niyam.users.v1`, `niyam.session.v1`, `niyam.tax.v1`).
 
 ## Run locally
 

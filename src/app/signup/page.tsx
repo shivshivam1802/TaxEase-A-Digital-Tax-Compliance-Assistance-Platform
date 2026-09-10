@@ -8,7 +8,7 @@ import { SignUpForm } from "@/components/auth/sign-up-form";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Create a Niyam account as an individual or small business.",
+  description: "Create a TaxEase account as an individual or small business.",
 };
 
 export default async function SignUpPage({

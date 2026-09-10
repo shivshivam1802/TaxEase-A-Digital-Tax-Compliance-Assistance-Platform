@@ -7,7 +7,7 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
   title: "Reset password",
-  description: "Choose a new password for your Niyam account.",
+  description: "Choose a new password for your TaxEase account.",
 };
 
 export default function ResetPasswordPage() {

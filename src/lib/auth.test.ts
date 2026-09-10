@@ -149,7 +149,7 @@ test("sign-up, sign-in, reset, and sign-out work against local storage", async (
   assert.equal(resetRequest.ok, true);
   if (!resetRequest.ok) return;
 
-  const token = new URL(resetRequest.data.resetUrl, "https://niyam.local").searchParams.get(
+  const token = new URL(resetRequest.data.resetUrl, "https://taxease.local").searchParams.get(
     "token"
   );
   assert.ok(token);

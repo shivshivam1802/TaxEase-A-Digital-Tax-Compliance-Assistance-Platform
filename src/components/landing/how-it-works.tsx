@@ -1,4 +1,4 @@
-import { steps } from "@/lib/site";
+import { steps, site } from "@/lib/site";
 
 export function HowItWorks() {
   return (
@@ -19,7 +19,7 @@ export function HowItWorks() {
             Four steps from first login to a year you can defend.
           </h2>
           <p className="mt-4 text-base leading-7 text-white/70">
-            No hidden “magic file” button. You enter facts, Niyam applies the
+            No hidden “magic file” button. You enter facts, {site.name} applies the
             rules, and you decide when a CA should look.
           </p>
         </div>

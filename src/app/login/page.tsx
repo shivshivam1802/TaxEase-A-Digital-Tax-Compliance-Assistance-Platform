@@ -8,7 +8,7 @@ import { SignInForm } from "@/components/auth/sign-in-form";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your Niyam account.",
+  description: "Sign in to your TaxEase account.",
 };
 
 export default function LoginPage() {
@@ -22,7 +22,7 @@ export default function LoginPage() {
         asideBody="Your account type — individual or small business — is already on file. The FY 2026–27 dashboard uses it for estimates, TDS, and statutory deadlines."
         footer={
           <>
-            New to Niyam?{" "}
+            New to TaxEase?{" "}
             <Link href="/signup" className="font-medium text-foreground underline underline-offset-3">
               Create an account
             </Link>

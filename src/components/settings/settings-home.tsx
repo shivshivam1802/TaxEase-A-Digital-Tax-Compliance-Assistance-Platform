@@ -225,7 +225,7 @@ function ExportCard() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `niyam-${user.email.replace(/[^a-z0-9]+/gi, "-")}.json`;
+    link.download = `taxease-${user.email.replace(/[^a-z0-9]+/gi, "-")}.json`;
     link.click();
     URL.revokeObjectURL(url);
   }

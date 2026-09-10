@@ -144,7 +144,7 @@ export function ItrHome() {
             {FY_2026_27.assessmentYear} return
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Build a filing pack from the income and TDS already on Niyam. This
+            Build a filing pack from the income and TDS already on TaxEase. This
             stays in your browser — it is not a submission to the Income Tax
             Department.
           </p>

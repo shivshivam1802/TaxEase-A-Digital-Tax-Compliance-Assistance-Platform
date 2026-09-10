@@ -5,7 +5,7 @@ import { DashboardHome } from "@/components/dashboard/dashboard-home";
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "FY 2026–27 tax overview for your Niyam account.",
+  description: "FY 2026–27 tax overview for your TaxEase account.",
 };
 
 export default function DashboardPage() {

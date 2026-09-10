@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 type LogoProps = {
@@ -16,7 +17,7 @@ export function Logo({ className, markClassName, href = "/#top" }: LogoProps) {
         "inline-flex items-center gap-2.5 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         className
       )}
-      aria-label="Niyam home"
+      aria-label={`${site.name} home`}
     >
       <span
         className={cn(
@@ -43,7 +44,7 @@ export function Logo({ className, markClassName, href = "/#top" }: LogoProps) {
         </svg>
       </span>
       <span className="font-heading text-xl leading-none tracking-tight text-foreground">
-        Niyam
+        {site.name}
       </span>
     </Link>
   );

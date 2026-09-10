@@ -1,10 +1,10 @@
 export const site = {
-  name: "Niyam",
-  tagline: "Tax compliance, made certain.",
+  name: "TaxEase",
+  tagline: "A Digital Tax Compliance Assistance Platform",
   description:
-    "Niyam is a tax compliance platform for individuals and small businesses. Calculate income tax, track TDS, prepare ITR filings, manage documents, and stay ahead of due dates — with help from a CA when you need it.",
-  url: "https://niyam.tax",
-  email: "hello@niyam.tax",
+    "TaxEase is a digital tax compliance assistance platform for individuals and small businesses. Calculate income tax, track TDS, prepare ITR filings, manage documents, and stay ahead of due dates — with help from a CA when you need it.",
+  url: "https://taxease.app",
+  email: "hello@taxease.app",
 } as const;
 
 export const navItems = [
@@ -98,7 +98,7 @@ export const steps = [
     step: "01",
     title: "Tell us who you are",
     description:
-      "Create a profile as an individual or a small business. Niyam uses that to show the right income types, deductions, and filing path.",
+      "Create a profile as an individual or a small business. TaxEase uses that to show the right income types, deductions, and filing path.",
   },
   {
     step: "02",

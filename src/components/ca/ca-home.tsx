@@ -56,11 +56,11 @@ export function CaHome() {
           CA desk
         </p>
         <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight sm:text-4xl">
-          Professionals on Niyam
+          Professionals on TaxEase
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
           Request a slot, share this year’s file only if you want, and track
-          status here. Fees are paid directly to the CA — Niyam does not collect
+          status here. Fees are paid directly to the CA — TaxEase does not collect
           them.
         </p>
       </div>
@@ -298,7 +298,7 @@ function RequestForm({
           onChange={(event) => setShareFile(event.target.checked)}
         />
         <span className="text-sm leading-6">
-          Share this year’s Niyam file (income, TDS, documents) with {professional.name}. You
+          Share this year’s TaxEase file (income, TDS, documents) with {professional.name}. You
           can revoke it later.
         </span>
       </label>

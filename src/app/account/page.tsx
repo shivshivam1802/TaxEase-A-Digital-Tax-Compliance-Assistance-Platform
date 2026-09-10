@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Account",
-  description: "Your Niyam account has moved to Settings.",
+  description: "Your TaxEase account has moved to Settings.",
 };
 
 export default function AccountPage() {

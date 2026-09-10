@@ -1,7 +1,7 @@
 import { Eye, Lock, Scale, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { trustPoints } from "@/lib/site";
+import { site, trustPoints } from "@/lib/site";
 
 const icons: Record<(typeof trustPoints)[number]["icon"], LucideIcon> = {
   lock: Lock,
@@ -30,7 +30,7 @@ export function Trust() {
               Your return is a confidential financial record. Treat it that way.
             </h2>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Niyam is designed so that tax data can move to a real backend
+              {site.name} is designed so that tax data can move to a real backend
               without changing how the product thinks about access, purpose, and
               retention. Early access requests stay in your browser until a
               server is connected.

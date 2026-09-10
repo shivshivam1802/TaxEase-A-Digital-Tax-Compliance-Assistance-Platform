@@ -271,7 +271,7 @@ export function validateFiling(input: {
 export function localAcknowledgement(now = new Date()) {
   const stamp = now.toISOString().slice(0, 10).replaceAll("-", "");
   const rand = Math.abs(hashCode(`${stamp}:${now.getTime()}`)).toString(16).slice(0, 6);
-  return `NIYAM-${stamp}-${rand.toUpperCase()}`;
+  return `TAXEASE-${stamp}-${rand.toUpperCase()}`;
 }
 
 function hashCode(value: string) {
