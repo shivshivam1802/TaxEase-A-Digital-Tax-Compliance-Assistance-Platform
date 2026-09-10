@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# If a wrapper still stamps Cursor Agent / Co-authored-by, rewrite HEAD once.
+set -euo pipefail
+
+[[ "${SKIP_AUTHOR_FIX:-}" == "1" ]] && exit 0
+
+AUTHOR_NAME="Shivam Kumar"
+AUTHOR_EMAIL="171482768+shivshivam1802@users.noreply.github.com"
+
+name="$(git log -1 --format='%an')"
+email="$(git log -1 --format='%ae')"
+body="$(git log -1 --format='%B')"
+
+needs_name=0
+needs_strip=0
+[[ "$name" == "$AUTHOR_NAME" && "$email" == "$AUTHOR_EMAIL" ]] || needs_name=1
+echo "$body" | grep -q -E '^Co-authored-by:' && needs_strip=1
+
+[[ "$needs_name" -eq 0 && "$needs_strip" -eq 0 ]] && exit 0
+
+clean="$(printf '%s\n' "$body" | grep -v -E '^Co-authored-by:|^Signed-off-by: Cursor|^Made-with: Cursor')"
+# Trim trailing blank lines
+clean="$(printf '%s\n' "$clean" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
+
+tmp="$(mktemp)"
+printf '%s\n' "$clean" > "$tmp"
+
+export SKIP_AUTHOR_FIX=1
+export GIT_AUTHOR_NAME="$AUTHOR_NAME"
+export GIT_AUTHOR_EMAIL="$AUTHOR_EMAIL"
+export GIT_COMMITTER_NAME="$AUTHOR_NAME"
+export GIT_COMMITTER_EMAIL="$AUTHOR_EMAIL"
+
+git -c "user.name=$AUTHOR_NAME" -c "user.email=$AUTHOR_EMAIL" \
+  commit --amend --no-verify --no-edit --file="$tmp" \
+  --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" >/dev/null
+
+rm -f "$tmp"

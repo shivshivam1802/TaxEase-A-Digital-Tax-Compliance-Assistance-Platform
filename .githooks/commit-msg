@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Drop Co-authored-by (and similar) trailers so the commit is a single author.
+set -euo pipefail
+
+msg_file="${1:-}"
+[[ -n "$msg_file" && -f "$msg_file" ]] || exit 0
+
+tmp="$(mktemp)"
+grep -v -E '^Co-authored-by:|^Signed-off-by: Cursor|^Made-with: Cursor' "$msg_file" \
+  | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
+  > "$tmp"
+mv "$tmp" "$msg_file"
