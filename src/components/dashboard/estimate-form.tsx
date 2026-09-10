@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,12 @@ export function EstimateForm({
     <form onSubmit={onSubmit} noValidate className="space-y-4">
       <p className="text-sm text-muted-foreground">
         Snapshot for a {userTypeLabel(userType).toLowerCase()} under the new regime.
-        Salary gets the ₹75,000 standard deduction automatically.
+        Salary gets the ₹75,000 standard deduction automatically. For old-regime
+        comparison,{" "}
+        <Link href="/calculator" className="font-medium text-foreground underline underline-offset-3">
+          open the calculator
+        </Link>
+        .
       </p>
       <AmountField
         id={`${formId}-salary`}

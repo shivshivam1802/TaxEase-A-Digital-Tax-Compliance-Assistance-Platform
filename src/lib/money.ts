@@ -26,3 +26,16 @@ export function parseRupees(value: string): number | null {
 export function rupeesInput(value: number) {
   return value === 0 ? "" : String(value);
 }
+
+export function formatPercent(rate: number) {
+  const percent = rate * 100;
+  const digits = Number.isInteger(percent) ? 0 : 2;
+  return `${percent.toLocaleString("en-IN", { maximumFractionDigits: digits })}%`;
+}
+
+export function formatSlabRange(from: number, to: number | null) {
+  if (to === null) {
+    return `Above ${formatCompactINR(from)}`;
+  }
+  return `${formatCompactINR(from)} – ${formatCompactINR(to)}`;
+}

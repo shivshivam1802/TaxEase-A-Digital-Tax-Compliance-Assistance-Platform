@@ -78,6 +78,15 @@ export function SiteHeader() {
                 Dashboard
               </Link>
               <Link
+                href="/calculator"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-10 px-4"
+                )}
+              >
+                Calculator
+              </Link>
+              <Link
                 href="/account"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
@@ -165,6 +174,20 @@ export function SiteHeader() {
                     }
                   >
                     Dashboard
+                  </SheetClose>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="/calculator"
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    Calculator
                   </SheetClose>
                   <SheetClose
                     nativeButton={false}

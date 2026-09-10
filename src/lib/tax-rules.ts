@@ -1,19 +1,30 @@
 /**
- * Versioned Indian tax rules used by the dashboard estimate.
- * FY 2026-27 / AY 2027-28 — new regime (default under s.115BAC).
+ * Versioned Indian tax rules used by the dashboard estimate and the calculator.
+ * FY 2026-27 / AY 2027-28.
  *
- * Sources encoded here: Budget 2025 slab structure (unchanged in Budget 2026
- * coverage), s.87A rebate up to ₹12 lakh, salaried standard deduction ₹75,000,
- * Health & Education Cess 4%.
+ * New regime (default under s.115BAC): Budget 2025 slab structure, s.87A rebate
+ * up to ₹12 lakh, salaried standard deduction ₹75,000, Health & Education Cess 4%,
+ * surcharge capped at 25% (no 37% slab).
  *
- * Surcharge and old-regime comparison are intentionally omitted until the
- * calculator module. Estimates above ₹50 lakh should be treated as incomplete.
+ * Old regime: pre-115BAC slabs, ₹50,000 standard deduction, s.87A up to ₹5 lakh,
+ * Chapter VI-A deductions, surcharge up to 37% above ₹5 crore.
+ *
+ * Capital gains special rates, AMT, and firm/company slabs are out of scope.
  */
 
 export const CURRENT_FY_ID = "FY2026-27";
 
 export type TaxSlab = {
   upTo: number | null;
+  rate: number;
+};
+
+export type RegimeId = "new" | "old";
+
+export type AgeBand = "below_60" | "senior" | "super_senior";
+
+export type SurchargeBracket = {
+  above: number;
   rate: number;
 };
 
@@ -29,8 +40,29 @@ export type FinancialYearRules = {
     maxTaxableIncome: number;
     maxRebate: number;
   };
+  surcharge: SurchargeBracket[];
+  oldRegime: OldRegimeRules;
   source: string;
 };
+
+export type OldRegimeRules = {
+  standardDeductionSalary: number;
+  rebate87A: {
+    maxTaxableIncome: number;
+    maxRebate: number;
+  };
+  surcharge: SurchargeBracket[];
+  basicExemption: Record<AgeBand, number>;
+  section80CLimit: number;
+  housingLoanInterestLimit: number;
+  section80DLimit: Record<AgeBand, number>;
+};
+
+export const AGE_BANDS: { value: AgeBand; label: string; hint: string }[] = [
+  { value: "below_60", label: "Under 60", hint: "Ordinary individual / HUF" },
+  { value: "senior", label: "60–79", hint: "Senior citizen (old regime exemption ₹3 lakh)" },
+  { value: "super_senior", label: "80 or older", hint: "Super senior (old regime exemption ₹5 lakh)" },
+];
 
 export const FY_2026_27: FinancialYearRules = {
   id: CURRENT_FY_ID,
@@ -52,7 +84,38 @@ export const FY_2026_27: FinancialYearRules = {
     maxTaxableIncome: 12_00_000,
     maxRebate: 60_000,
   },
-  source: "New regime default slabs for FY 2026-27; s.87A rebate; 4% cess.",
+  surcharge: [
+    { above: 2_00_00_000, rate: 0.25 },
+    { above: 1_00_00_000, rate: 0.15 },
+    { above: 50_00_000, rate: 0.1 },
+  ],
+  oldRegime: {
+    standardDeductionSalary: 50_000,
+    rebate87A: {
+      maxTaxableIncome: 5_00_000,
+      maxRebate: 12_500,
+    },
+    surcharge: [
+      { above: 5_00_00_000, rate: 0.37 },
+      { above: 2_00_00_000, rate: 0.25 },
+      { above: 1_00_00_000, rate: 0.15 },
+      { above: 50_00_000, rate: 0.1 },
+    ],
+    basicExemption: {
+      below_60: 2_50_000,
+      senior: 3_00_000,
+      super_senior: 5_00_000,
+    },
+    section80CLimit: 1_50_000,
+    housingLoanInterestLimit: 2_00_000,
+    section80DLimit: {
+      below_60: 25_000,
+      senior: 50_000,
+      super_senior: 50_000,
+    },
+  },
+  source:
+    "New regime default slabs for FY 2026-27; old regime comparison; s.87A; surcharge; 4% cess.",
 };
 
 export type StatutoryDeadline = {
@@ -118,4 +181,19 @@ export const STATUTORY_DEADLINES: StatutoryDeadline[] = [
 export function getRules(fyId = CURRENT_FY_ID) {
   if (fyId === FY_2026_27.id) return FY_2026_27;
   return FY_2026_27;
+}
+
+export function oldRegimeSlabs(ageBand: AgeBand, fyId?: string): TaxSlab[] {
+  const exemption = getRules(fyId).oldRegime.basicExemption[ageBand];
+  const slabs: TaxSlab[] = [{ upTo: exemption, rate: 0 }];
+  if (exemption < 5_00_000) {
+    slabs.push({ upTo: 5_00_000, rate: 0.05 });
+  }
+  slabs.push({ upTo: 10_00_000, rate: 0.2 });
+  slabs.push({ upTo: null, rate: 0.3 });
+  return slabs;
+}
+
+export function section80DLimit(ageBand: AgeBand, fyId?: string) {
+  return getRules(fyId).oldRegime.section80DLimit[ageBand];
 }

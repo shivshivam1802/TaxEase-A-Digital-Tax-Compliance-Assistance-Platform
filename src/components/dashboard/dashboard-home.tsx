@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  Calculator,
   CalendarDays,
   FileText,
   FolderClosed,
@@ -141,10 +142,10 @@ export function DashboardHome() {
             <FileText /> Update ITR status
           </Button>
           <Link
-            href="/account"
+            href="/calculator"
             className={cn(buttonVariants({ variant: "outline" }), "h-11 justify-start px-4")}
           >
-            Account
+            <Calculator /> Tax calculator
           </Link>
         </div>
       </section>
@@ -239,15 +240,25 @@ function EstimateCard({
           <Row label="Taxable income" value={formatINR(computation.taxableIncome)} />
           <Row label="Slab tax" value={formatINR(computation.slabTax)} />
           <Row label="s.87A rebate" value={formatINR(computation.rebate87A)} />
+          {computation.surcharge > 0 ? (
+            <Row label="Surcharge" value={formatINR(computation.surcharge)} />
+          ) : null}
           <Row label="Cess 4%" value={formatINR(computation.cess)} />
           <Row label="Total" value={formatINR(computation.totalTax)} strong />
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           No income recorded for this year. Add salary, business, or other
-          income to compute tax from the FY 2026–27 new-regime slabs.
+          income to compute tax from the FY 2026–27 new-regime slabs, or open
+          the calculator to compare regimes.
         </p>
       )}
+      <Link
+        href="/calculator"
+        className="mt-4 inline-block text-sm font-medium text-primary underline-offset-3 hover:underline"
+      >
+        Compare new vs old regime
+      </Link>
     </article>
   );
 }

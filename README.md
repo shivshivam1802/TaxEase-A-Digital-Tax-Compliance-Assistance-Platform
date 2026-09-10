@@ -2,7 +2,7 @@
 
 Niyam is a tax compliance platform for individuals and small businesses in India. It is being built **one module at a time**.
 
-This repository currently ships Steps 1–3: landing page, authentication, and the user dashboard.
+This repository currently ships Steps 1–4: landing page, authentication, the user dashboard, and the tax calculator.
 
 ## What is live
 
@@ -15,8 +15,13 @@ This repository currently ships Steps 1–3: landing page, authentication, and t
   - Statutory deadlines
   - Empty document vault (upload ships later)
   - Quick actions that open real forms
+- Tax calculator:
+  - New vs old regime comparison with a recommendation
+  - s.87A rebate, surcharge (with marginal relief), and 4% cess
+  - Old-regime 80C / 80D / HRA / housing-loan interest (capped)
+  - Save the snapshot back to the dashboard
 
-The full calculator, TDS module, ITR assistant, document vault, calendar, CA desk, and settings are **not** built yet.
+The TDS module, ITR assistant, document vault, calendar, CA desk, and settings are **not** built yet.
 
 ## Run locally
 

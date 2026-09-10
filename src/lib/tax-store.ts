@@ -1,6 +1,14 @@
 import { parseRupees } from "@/lib/money";
-import { CURRENT_FY_ID } from "@/lib/tax-rules";
-import { computeTax, emptyIncome, type IncomeSnapshot, type TaxComputation } from "@/lib/tax-engine";
+import { CURRENT_FY_ID, type AgeBand } from "@/lib/tax-rules";
+import {
+  computeTax,
+  emptyCalculatorInput,
+  emptyIncome,
+  incomeFromCalculator,
+  type CalculatorInput,
+  type IncomeSnapshot,
+  type TaxComputation,
+} from "@/lib/tax-engine";
 
 export const TAX_STORE_KEY = "niyam.tax.v1";
 export const TAX_CHANGE_EVENT = "niyam-tax-change";
@@ -30,6 +38,7 @@ export type TaxYearRecord = {
   tds: TdsEntry[];
   itrStatus: ItrStatus;
   itrUpdatedAt: string | null;
+  calculator: CalculatorInput | null;
   updatedAt: string;
 };
 
@@ -44,6 +53,7 @@ export function emptyYear(fyId = CURRENT_FY_ID): TaxYearRecord {
     tds: [],
     itrStatus: "not_started",
     itrUpdatedAt: null,
+    calculator: null,
     updatedAt: "",
   };
 }
@@ -58,7 +68,31 @@ export function saveIncome(
   income: IncomeSnapshot,
   fyId = CURRENT_FY_ID
 ): TaxYearRecord {
-  return patchYear(userId, fyId, (year) => ({ ...year, income }));
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    income,
+    calculator: year.calculator
+      ? {
+          ...year.calculator,
+          salary: income.salary,
+          business: income.business,
+          other: income.other,
+          newOtherDeductions: income.deductions,
+        }
+      : year.calculator,
+  }));
+}
+
+export function saveCalculator(
+  userId: string,
+  input: CalculatorInput,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    income: incomeFromCalculator(input),
+    calculator: input,
+  }));
 }
 
 export function addTds(
@@ -149,6 +183,83 @@ export function validateIncomeInput(input: {
   return { ok: true, data };
 }
 
+const AGE_BANDS: AgeBand[] = ["below_60", "senior", "super_senior"];
+
+function isAgeBand(value: string): value is AgeBand {
+  return AGE_BANDS.includes(value as AgeBand);
+}
+
+export function parseCalculatorDraft(input: {
+  salary: string;
+  business: string;
+  other: string;
+  newOtherDeductions: string;
+  section80C: string;
+  section80D: string;
+  hraExemption: string;
+  housingLoanInterest: string;
+  ageBand: string;
+}):
+  | { ok: true; data: CalculatorInput }
+  | { ok: false; errors: Record<string, string> } {
+  const errors: Record<string, string> = {};
+  const salary = parseField(input.salary, "salary", errors);
+  const business = parseField(input.business, "business", errors);
+  const other = parseField(input.other, "other", errors);
+  const newOtherDeductions = parseField(
+    input.newOtherDeductions,
+    "newOtherDeductions",
+    errors
+  );
+  const section80C = parseField(input.section80C, "section80C", errors);
+  const section80D = parseField(input.section80D, "section80D", errors);
+  const hraExemption = parseField(input.hraExemption, "hraExemption", errors);
+  const housingLoanInterest = parseField(
+    input.housingLoanInterest,
+    "housingLoanInterest",
+    errors
+  );
+
+  if (!isAgeBand(input.ageBand)) {
+    errors.ageBand = "Choose an age band.";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    data: {
+      salary: salary ?? 0,
+      business: business ?? 0,
+      other: other ?? 0,
+      ageBand: isAgeBand(input.ageBand) ? input.ageBand : "below_60",
+      newOtherDeductions: newOtherDeductions ?? 0,
+      section80C: section80C ?? 0,
+      section80D: section80D ?? 0,
+      hraExemption: hraExemption ?? 0,
+      housingLoanInterest: housingLoanInterest ?? 0,
+    },
+  };
+}
+
+export function validateCalculatorInput(
+  input: Parameters<typeof parseCalculatorDraft>[0]
+):
+  | { ok: true; data: CalculatorInput }
+  | { ok: false; errors: Record<string, string> } {
+  const parsed = parseCalculatorDraft(input);
+  if (!parsed.ok) return parsed;
+  if (parsed.data.salary + parsed.data.business + parsed.data.other === 0) {
+    return {
+      ok: false,
+      errors: { form: "Enter at least one income amount." },
+    };
+  }
+  return parsed;
+}
+
 export function validateTdsInput(input: {
   kind: string;
   amount: string;
@@ -234,4 +345,4 @@ function writeStore(store: TaxStore) {
   window.dispatchEvent(new Event(TAX_CHANGE_EVENT));
 }
 
-export { emptyIncome, computeTax };
+export { emptyIncome, emptyCalculatorInput, computeTax };
