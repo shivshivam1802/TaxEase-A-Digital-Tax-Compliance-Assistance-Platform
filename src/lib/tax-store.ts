@@ -9,6 +9,17 @@ import {
   type IncomeSnapshot,
   type TaxComputation,
 } from "@/lib/tax-engine";
+import {
+  EMPTY_TDS_RETURNS,
+  isTdsSection,
+  type TdsDepositStatus,
+  type TdsEntry,
+  type TdsKind,
+  type TdsQuarterId,
+  type TdsReturnStatus,
+  type TdsSection,
+} from "@/lib/tds-rules";
+import { PAN_PATTERN, suggestedTds } from "@/lib/tds";
 
 export const TAX_STORE_KEY = "niyam.tax.v1";
 export const TAX_CHANGE_EVENT = "niyam-tax-change";
@@ -20,17 +31,9 @@ export const ITR_STATUSES = [
   { value: "verified", label: "e-Verified" },
 ] as const;
 
+export type { TdsDepositStatus, TdsEntry, TdsKind, TdsQuarterId, TdsReturnStatus, TdsSection };
+
 export type ItrStatus = (typeof ITR_STATUSES)[number]["value"];
-
-export type TdsKind = "deducted" | "received";
-
-export type TdsEntry = {
-  id: string;
-  kind: TdsKind;
-  amount: number;
-  source: string;
-  on: string;
-};
 
 export type TaxYearRecord = {
   fyId: string;
@@ -39,6 +42,7 @@ export type TaxYearRecord = {
   itrStatus: ItrStatus;
   itrUpdatedAt: string | null;
   calculator: CalculatorInput | null;
+  tdsReturns: Record<TdsQuarterId, TdsReturnStatus>;
   updatedAt: string;
 };
 
@@ -54,6 +58,7 @@ export function emptyYear(fyId = CURRENT_FY_ID): TaxYearRecord {
     itrStatus: "not_started",
     itrUpdatedAt: null,
     calculator: null,
+    tdsReturns: { ...EMPTY_TDS_RETURNS },
     updatedAt: "",
   };
 }
@@ -107,6 +112,20 @@ export function addTds(
   }));
 }
 
+export function updateTds(
+  userId: string,
+  tdsId: string,
+  input: Omit<TdsEntry, "id">,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    tds: year.tds.map((entry) =>
+      entry.id === tdsId ? { ...input, id: tdsId } : entry
+    ),
+  }));
+}
+
 export function removeTds(
   userId: string,
   tdsId: string,
@@ -115,6 +134,21 @@ export function removeTds(
   return patchYear(userId, fyId, (year) => ({
     ...year,
     tds: year.tds.filter((entry) => entry.id !== tdsId),
+  }));
+}
+
+export function setTdsReturnStatus(
+  userId: string,
+  quarter: TdsQuarterId,
+  status: TdsReturnStatus,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    tdsReturns: {
+      ...(year.tdsReturns ?? EMPTY_TDS_RETURNS),
+      [quarter]: status,
+    },
   }));
 }
 
@@ -265,21 +299,70 @@ export function validateTdsInput(input: {
   amount: string;
   source: string;
   on: string;
+  section?: string;
+  paymentAmount?: string;
+  ratePercent?: string;
+  pan?: string;
+  note?: string;
+  depositStatus?: string;
+  depositedOn?: string;
 }):
   | { ok: true; data: Omit<TdsEntry, "id"> }
   | { ok: false; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
-  const amount = parseField(input.amount, "amount", errors);
   const source = input.source.trim();
   const on = input.on.trim();
+  const pan = (input.pan ?? "").trim().toUpperCase();
+  const note = (input.note ?? "").trim();
+  const section = input.section && isTdsSection(input.section) ? input.section : "other";
+
+  const paymentAmount = parseOptionalRupees(
+    input.paymentAmount ?? "",
+    "paymentAmount",
+    errors
+  );
+  const rate = parseRatePercent(input.ratePercent ?? "", errors);
+
+  let amount = parseField(input.amount, "amount", errors);
+  if (
+    (amount === 0 || input.amount.trim() === "") &&
+    paymentAmount &&
+    rate &&
+    rate > 0
+  ) {
+    amount = suggestedTds(paymentAmount, rate);
+    delete errors.amount;
+  }
 
   if (input.kind !== "deducted" && input.kind !== "received") {
-    errors.kind = "Choose deducted or received.";
+    errors.kind = "Choose credit or tax you deducted.";
   }
-  if (amount === 0) errors.amount = "Enter a TDS amount greater than zero.";
-  if (!source) errors.source = "Say who deducted or paid this TDS.";
-  else if (source.length > 80) errors.source = "Keep the source under 80 characters.";
+  if (amount === 0 || amount === null) {
+    errors.amount = "Enter a TDS amount greater than zero.";
+  }
+  if (!source) errors.source = "Say who deducted or who you paid.";
+  else if (source.length > 80) errors.source = "Keep the name under 80 characters.";
   if (!on) errors.on = "Pick the date this TDS was booked.";
+  if (pan && !PAN_PATTERN.test(pan)) {
+    errors.pan = "PAN should look like ABCDE1234F.";
+  }
+  if (note.length > 120) errors.note = "Keep the note under 120 characters.";
+
+  let depositStatus: TdsDepositStatus =
+    input.kind === "received" ? "pending" : "not_applicable";
+  if (
+    input.depositStatus === "not_applicable" ||
+    input.depositStatus === "pending" ||
+    input.depositStatus === "deposited"
+  ) {
+    depositStatus = input.depositStatus;
+  }
+  if (input.kind === "deducted") depositStatus = "not_applicable";
+
+  const depositedOn = (input.depositedOn ?? "").trim();
+  if (depositStatus === "deposited" && !depositedOn) {
+    errors.depositedOn = "Enter the challan / deposit date.";
+  }
 
   if (Object.keys(errors).length > 0 || amount === null) {
     return { ok: false, errors };
@@ -294,8 +377,39 @@ export function validateTdsInput(input: {
       amount,
       source,
       on,
+      section,
+      paymentAmount: paymentAmount || null,
+      rate,
+      pan,
+      note,
+      depositStatus,
+      depositedOn: depositStatus === "deposited" ? depositedOn : null,
     },
   };
+}
+
+function parseOptionalRupees(
+  value: string,
+  key: string,
+  errors: Record<string, string>
+) {
+  if (!value.trim()) return 0;
+  return parseField(value, key, errors) ?? 0;
+}
+
+function parseRatePercent(value: string, errors: Record<string, string>) {
+  if (!value.trim()) return null;
+  const cleaned = value.replace(/%/g, "").trim();
+  if (!/^\d+(\.\d{1,4})?$/.test(cleaned)) {
+    errors.ratePercent = "Enter a rate like 10 or 0.1.";
+    return null;
+  }
+  const percent = Number(cleaned);
+  if (percent < 0 || percent > 100) {
+    errors.ratePercent = "Rate must be between 0 and 100.";
+    return null;
+  }
+  return percent / 100;
 }
 
 function parseField(value: string, key: string, errors: Record<string, string>) {

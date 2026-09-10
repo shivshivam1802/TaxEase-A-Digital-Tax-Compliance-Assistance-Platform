@@ -87,6 +87,15 @@ export function SiteHeader() {
                 Calculator
               </Link>
               <Link
+                href="/tds"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-10 px-4"
+                )}
+              >
+                TDS
+              </Link>
+              <Link
                 href="/account"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
@@ -188,6 +197,20 @@ export function SiteHeader() {
                     }
                   >
                     Calculator
+                  </SheetClose>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="/tds"
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    TDS
                   </SheetClose>
                   <SheetClose
                     nativeButton={false}

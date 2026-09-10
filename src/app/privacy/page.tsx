@@ -32,10 +32,11 @@ export default function PrivacyPage() {
       </p>
       <h2>Tax year records</h2>
       <p>
-        The dashboard stores income snapshots, TDS lines, and ITR status per
-        account in <code>niyam.tax.v1</code>. The calculator stores the same
-        income plus old-regime deduction details in that record. Amounts never
-        leave this browser until a server is connected.
+        The dashboard stores income snapshots, TDS lines, ITR status, and
+        calculator details per account in <code>niyam.tax.v1</code>. The TDS
+        ledger adds section, PAN, deposit status, and quarterly return markers
+        to those lines. Amounts never leave this browser until a server is
+        connected.
       </p>
       <h2>Early access list</h2>
       <p>

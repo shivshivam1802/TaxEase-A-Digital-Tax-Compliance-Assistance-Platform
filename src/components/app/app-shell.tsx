@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 const appNav = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calculator", label: "Calculator" },
+  { href: "/tds", label: "TDS" },
   { href: "/account", label: "Account" },
 ] as const;
 
@@ -94,7 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SheetHeader>
             <SheetTitle className="sr-only">Workspace menu</SheetTitle>
             <SheetDescription className="sr-only">
-              Dashboard, calculator, and account
+              Dashboard, calculator, TDS, and account
             </SheetDescription>
             <Logo href="/dashboard" />
           </SheetHeader>

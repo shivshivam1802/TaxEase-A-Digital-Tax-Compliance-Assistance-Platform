@@ -285,14 +285,22 @@ function TdsCard({
     <article className="rounded-2xl border border-border bg-card p-5">
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-heading text-lg font-medium">TDS summary</h2>
-        <Button type="button" variant="outline" size="sm" className="h-8" onClick={onAdd}>
-          <Plus /> Add
-        </Button>
+        <div className="flex gap-2">
+          <Link
+            href="/tds"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "h-8")}
+          >
+            Ledger
+          </Link>
+          <Button type="button" variant="outline" size="sm" className="h-8" onClick={onAdd}>
+            <Plus /> Add
+          </Button>
+        </div>
       </div>
       {year.tds.length === 0 ? (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          No TDS lines yet. Record tax deducted at source (Form 16 / 26AS) so
-          payable tax on the overview stays honest.
+          No TDS lines yet. Record Form 16 / 26AS credit, or tax you deducted
+          from a payee, so payable tax on the overview stays honest.
         </p>
       ) : (
         <>
