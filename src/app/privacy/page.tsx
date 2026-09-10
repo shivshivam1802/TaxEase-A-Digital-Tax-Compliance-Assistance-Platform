@@ -30,6 +30,12 @@ export default function PrivacyPage() {
         30-minute token next to your account and shows the link on screen. In
         production the same token would be emailed, not displayed.
       </p>
+      <h2>Tax year records</h2>
+      <p>
+        The dashboard stores income snapshots, TDS lines, and ITR status per
+        account in <code>niyam.tax.v1</code>. Amounts never leave this browser
+        until a server is connected.
+      </p>
       <h2>Early access list</h2>
       <p>
         The original waitlist form, if used, stored name, email, and filer type

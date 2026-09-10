@@ -13,7 +13,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     if (!user) {
-      const next = encodeURIComponent(pathname || "/account");
+      const next = encodeURIComponent(pathname || "/dashboard");
       router.replace(`/login?next=${next}`);
     }
   }, [pathname, ready, router, user]);
@@ -35,7 +35,7 @@ export function RedirectIfSignedIn({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (ready && user) {
-      router.replace("/account");
+      router.replace("/dashboard");
     }
   }, [ready, router, user]);
 

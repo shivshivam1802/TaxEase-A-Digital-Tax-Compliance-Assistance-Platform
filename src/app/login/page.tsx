@@ -19,7 +19,7 @@ export default function LoginPage() {
         description="Use the email and password you created. Forgot it? Reset it in this browser — no inbox required in this build."
         headerAction={{ href: "/signup", label: "Create account" }}
         asideTitle="Welcome back."
-        asideBody="Your account type — individual or small business — is already on file. The workspace modules will read it when they ship."
+        asideBody="Your account type — individual or small business — is already on file. The FY 2026–27 dashboard uses it for estimates, TDS, and statutory deadlines."
         footer={
           <>
             New to Niyam?{" "}

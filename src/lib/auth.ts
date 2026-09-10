@@ -194,7 +194,7 @@ export function validateResetPasswordInput(input: {
 
 export function safeNextPath(value: string | null | undefined) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
-    return "/account";
+    return "/dashboard";
   }
   return value;
 }

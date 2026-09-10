@@ -40,7 +40,7 @@ export function ResetPasswordForm() {
       return;
     }
 
-    router.push("/account");
+    router.push("/dashboard");
   }
 
   return (

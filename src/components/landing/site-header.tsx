@@ -72,6 +72,12 @@ export function SiteHeader() {
           {ready && user ? (
             <>
               <Link
+                href="/dashboard"
+                className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
+              >
+                Dashboard
+              </Link>
+              <Link
                 href="/account"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
@@ -80,7 +86,7 @@ export function SiteHeader() {
               >
                 Account
               </Link>
-              <Button type="button" className="h-10 px-4" onClick={handleSignOut}>
+              <Button type="button" variant="outline" className="h-10 px-4" onClick={handleSignOut}>
                 Sign out
               </Button>
             </>
@@ -150,6 +156,20 @@ export function SiteHeader() {
                     nativeButton={false}
                     render={
                       <Link
+                        href="/dashboard"
+                        className={cn(
+                          buttonVariants({ size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    Dashboard
+                  </SheetClose>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
                         href="/account"
                         className={cn(
                           buttonVariants({ variant: "outline", size: "lg" }),
@@ -160,7 +180,7 @@ export function SiteHeader() {
                   >
                     Account
                   </SheetClose>
-                  <Button type="button" className="h-11 w-full px-4" onClick={handleSignOut}>
+                  <Button type="button" variant="outline" className="h-11 w-full px-4" onClick={handleSignOut}>
                     Sign out
                   </Button>
                 </>

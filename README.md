@@ -2,17 +2,21 @@
 
 Niyam is a tax compliance platform for individuals and small businesses in India. It is being built **one module at a time**.
 
-This repository currently ships **Step 1 — Landing page** and **Step 2 — Authentication**.
+This repository currently ships Steps 1–3: landing page, authentication, and the user dashboard.
 
 ## What is live
 
-- Marketing landing page (hero, services, benefits, how-it-works, security)
-- Create account, sign in, forgot password, and reset password
-- User type at sign-up: Individual or Small business
-- Signed-in account page (session confirmation — the tax dashboard is not built yet)
-- Accounts stored in the browser: salted SHA-256 password hashes in `localStorage`
+- Marketing landing page
+- Sign up, sign in, forgot password, reset password (Individual or Small business)
+- Signed-in dashboard for FY 2026–27:
+  - Tax overview and estimated tax from a versioned new-regime rules file
+  - TDS summary (add / delete lines)
+  - ITR status
+  - Statutory deadlines
+  - Empty document vault (upload ships later)
+  - Quick actions that open real forms
 
-The dashboard, calculator, TDS, ITR, documents, calendar, and CA modules are **not** built yet.
+The full calculator, TDS module, ITR assistant, document vault, calendar, CA desk, and settings are **not** built yet.
 
 ## Run locally
 
@@ -29,9 +33,4 @@ Open [http://127.0.0.1:4317](http://127.0.0.1:4317).
 npm run lint
 npm test
 npm run build
-npm start
 ```
-
-## Stack
-
-Next.js (App Router), TypeScript, Tailwind CSS, and shadcn/ui.

@@ -29,9 +29,9 @@ export function AccessCta() {
             Open an account as an individual or a small business.
           </h2>
           <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-            Sign-up is live. Choose your filer type so later modules — calculator,
-            TDS, ITR — open on the right path. You can reset a forgotten password
-            in this browser without waiting on email.
+            Sign-up is live. Choose your filer type so the dashboard, and later
+            the calculator, TDS, and ITR modules, open on the right path. You can
+            reset a forgotten password in this browser without waiting on email.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-foreground">
             <li className="flex gap-3">
