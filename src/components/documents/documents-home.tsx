@@ -297,10 +297,10 @@ function DocumentForm({
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="doc-file">File (optional)</Label>
-        <Input
+        <input
           id="doc-file"
           type="file"
-          className="h-10 py-1.5"
+          className="h-10 w-full rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-2 file:py-1 file:text-sm"
           onChange={(event) => void onFile(event.target.files)}
         />
         {errors.file ? <p className="text-xs text-destructive">{errors.file}</p> : null}
