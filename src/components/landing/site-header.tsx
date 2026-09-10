@@ -14,7 +14,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/brand/logo";
 import { navItems } from "@/lib/site";
@@ -106,20 +105,21 @@ export function SiteHeader() {
           )}
         </div>
 
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="lg:hidden"
+          aria-label="Open menu"
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          onClick={() => setOpen(true)}
+        >
+          <Menu />
+        </Button>
+
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            render={
-              <Button
-                variant="outline"
-                size="icon"
-                className="lg:hidden"
-                aria-label="Open menu"
-              />
-            }
-          >
-            <Menu />
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[min(100%,20rem)]">
+          <SheetContent side="right" className="w-[min(100%,20rem)]" id="mobile-nav">
             <SheetHeader>
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">
