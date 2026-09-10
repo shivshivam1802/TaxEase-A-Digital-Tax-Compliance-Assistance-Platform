@@ -7,7 +7,10 @@ import {
   normalizeEmail,
   validateEmailAddress,
   validatePersonName,
+  validatePan,
+  validatePhone,
 } from "@/lib/validation";
+import { deleteUserTaxData } from "@/lib/tax-store";
 
 export const USERS_STORAGE_KEY = "niyam.users.v1";
 export const SESSION_STORAGE_KEY = "niyam.session.v1";
@@ -20,6 +23,8 @@ export type AuthUser = {
   name: string;
   email: string;
   userType: UserType;
+  pan: string;
+  phone: string;
   passwordSalt: string;
   passwordHash: string;
   createdAt: string;
@@ -35,6 +40,8 @@ export type PublicUser = {
   name: string;
   email: string;
   userType: UserType;
+  pan: string;
+  phone: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -61,6 +68,8 @@ export function toPublicUser(user: AuthUser): PublicUser {
     name: user.name,
     email: user.email,
     userType: user.userType,
+    pan: user.pan ?? "",
+    phone: user.phone ?? "",
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -260,6 +269,8 @@ export async function signUp(input: {
     name: validated.data.name,
     email: validated.data.email,
     userType: validated.data.userType,
+    pan: "",
+    phone: "",
     passwordSalt,
     passwordHash: await hashPassword(validated.data.password, passwordSalt),
     createdAt: now,
@@ -391,6 +402,154 @@ export async function resetPassword(input: {
   emitAuthChange();
 
   return { ok: true, data: toPublicUser(updated) };
+}
+
+export function validateProfileInput(input: {
+  name: string;
+  userType: string;
+  pan: string;
+  phone: string;
+}):
+  | {
+      ok: true;
+      data: { name: string; userType: UserType; pan: string; phone: string };
+    }
+  | { ok: false; errors: FieldErrors } {
+  const errors: FieldErrors = {};
+  const nameError = validatePersonName(input.name);
+  const panError = validatePan(input.pan);
+  const phoneError = validatePhone(input.phone);
+
+  if (nameError) errors.name = nameError;
+  if (panError) errors.pan = panError;
+  if (phoneError) errors.phone = phoneError;
+  if (!isUserType(input.userType)) {
+    errors.userType = "Choose Individual or Small business.";
+  }
+
+  if (Object.keys(errors).length > 0 || !isUserType(input.userType)) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    data: {
+      name: cleanPersonName(input.name),
+      userType: input.userType,
+      pan: input.pan.trim().toUpperCase(),
+      phone: input.phone.trim(),
+    },
+  };
+}
+
+export function updateProfile(input: {
+  name: string;
+  userType: string;
+  pan: string;
+  phone: string;
+}): AuthResult<PublicUser> {
+  const session = readSession();
+  if (!session) {
+    return { ok: false, errors: { form: "Sign in to update your profile." } };
+  }
+
+  const validated = validateProfileInput(input);
+  if (!validated.ok) return validated;
+
+  const users = readUsers();
+  const index = users.findIndex((user) => user.id === session.userId);
+  if (index === -1) {
+    return { ok: false, errors: { form: "This account is no longer on this browser." } };
+  }
+
+  const updated: AuthUser = {
+    ...users[index],
+    name: validated.data.name,
+    userType: validated.data.userType,
+    pan: validated.data.pan,
+    phone: validated.data.phone,
+    updatedAt: new Date().toISOString(),
+  };
+  users[index] = updated;
+  writeUsers(users);
+  emitAuthChange();
+  return { ok: true, data: toPublicUser(updated) };
+}
+
+export async function changePassword(input: {
+  currentPassword: string;
+  password: string;
+  confirmPassword: string;
+}): Promise<AuthResult<PublicUser>> {
+  const session = readSession();
+  if (!session) {
+    return { ok: false, errors: { form: "Sign in to change your password." } };
+  }
+
+  const errors: FieldErrors = {};
+  if (!input.currentPassword) errors.currentPassword = "Enter your current password.";
+  const passwordError = validatePassword(input.password);
+  if (passwordError) errors.password = passwordError;
+  if (!input.confirmPassword) {
+    errors.confirmPassword = "Re-enter your new password.";
+  } else if (input.password !== input.confirmPassword) {
+    errors.confirmPassword = "Passwords do not match.";
+  }
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors };
+  }
+
+  const users = readUsers();
+  const index = users.findIndex((user) => user.id === session.userId);
+  if (index === -1) {
+    return { ok: false, errors: { form: "This account is no longer on this browser." } };
+  }
+
+  const user = users[index];
+  const currentHash = await hashPassword(input.currentPassword, user.passwordSalt);
+  if (currentHash !== user.passwordHash) {
+    return { ok: false, errors: { currentPassword: "Current password is incorrect." } };
+  }
+
+  const passwordSalt = createSalt();
+  const updated: AuthUser = {
+    ...user,
+    passwordSalt,
+    passwordHash: await hashPassword(input.password, passwordSalt),
+    updatedAt: new Date().toISOString(),
+  };
+  users[index] = updated;
+  writeUsers(users);
+  emitAuthChange();
+  return { ok: true, data: toPublicUser(updated) };
+}
+
+export async function deleteAccount(password: string): Promise<AuthResult<{ ok: true }>> {
+  const session = readSession();
+  if (!session) {
+    return { ok: false, errors: { form: "Sign in to delete this account." } };
+  }
+  if (!password) {
+    return { ok: false, errors: { password: "Enter your password to confirm." } };
+  }
+
+  const users = readUsers();
+  const index = users.findIndex((user) => user.id === session.userId);
+  if (index === -1) {
+    return { ok: false, errors: { form: "This account is no longer on this browser." } };
+  }
+
+  const user = users[index];
+  const hash = await hashPassword(password, user.passwordSalt);
+  if (hash !== user.passwordHash) {
+    return { ok: false, errors: { password: "Password is incorrect." } };
+  }
+
+  writeUsers(users.filter((entry) => entry.id !== user.id));
+  deleteUserTaxData(user.id);
+  removeKey(SESSION_STORAGE_KEY);
+  emitAuthChange();
+  return { ok: true, data: { ok: true } };
 }
 
 export async function hashPassword(password: string, salt: string) {

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 4317",
     "lint": "eslint",
-    "test": "npx tsx --test src/lib/waitlist.test.ts src/lib/auth.test.ts src/lib/tax-engine.test.ts src/lib/tds.test.ts"
+    "test": "npx tsx --test src/lib/waitlist.test.ts src/lib/auth.test.ts src/lib/tax-engine.test.ts src/lib/tds.test.ts src/lib/itr.test.ts src/lib/documents.test.ts src/lib/calendar.test.ts src/lib/consult.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

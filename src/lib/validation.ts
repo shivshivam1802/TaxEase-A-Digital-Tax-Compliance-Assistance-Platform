@@ -39,3 +39,24 @@ export function validateEmailAddress(email: string): string | undefined {
 export function cleanPersonName(name: string) {
   return name.trim().replace(/\s+/g, " ");
 }
+
+const PAN_PATTERN = /^[A-Z]{5}[0-9]{4}[A-Z]$/i;
+const PHONE_PATTERN = /^[6-9]\d{9}$/;
+
+export function validatePan(pan: string): string | undefined {
+  const value = pan.trim();
+  if (!value) return undefined;
+  if (!PAN_PATTERN.test(value)) {
+    return "PAN should look like ABCDE1234F.";
+  }
+  return undefined;
+}
+
+export function validatePhone(phone: string): string | undefined {
+  const value = phone.trim();
+  if (!value) return undefined;
+  if (!PHONE_PATTERN.test(value)) {
+    return "Enter a 10-digit Indian mobile number.";
+  }
+  return undefined;
+}

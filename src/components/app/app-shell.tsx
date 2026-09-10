@@ -22,7 +22,11 @@ const appNav = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calculator", label: "Calculator" },
   { href: "/tds", label: "TDS" },
-  { href: "/account", label: "Account" },
+  { href: "/itr", label: "ITR" },
+  { href: "/documents", label: "Documents" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/ca", label: "CA desk" },
+  { href: "/settings", label: "Settings" },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -48,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:h-[4.25rem] sm:px-6 lg:px-8">
           <Logo href="/dashboard" />
-          <nav aria-label="Workspace" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Workspace" className="hidden items-center gap-0.5 overflow-x-auto lg:flex">
             {appNav.map((item) => {
               const current = pathname === item.href;
               return (
@@ -57,7 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   href={item.href}
                   aria-current={current ? "page" : undefined}
                   className={cn(
-                    "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-foreground",
+                    "rounded-lg px-2 py-2 text-[13px] font-medium whitespace-nowrap transition-colors hover:bg-secondary hover:text-foreground",
                     current ? "bg-secondary text-foreground" : "text-muted-foreground"
                   )}
                 >
@@ -66,9 +70,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             {user ? (
-              <p className="max-w-[12rem] truncate text-sm text-muted-foreground">
+              <p className="hidden max-w-[10rem] truncate text-sm text-muted-foreground xl:block">
                 {user.email}
               </p>
             ) : null}
@@ -80,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             type="button"
             variant="outline"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             aria-label="Open menu"
             aria-expanded={open}
             onClick={() => setOpen(true)}
@@ -95,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SheetHeader>
             <SheetTitle className="sr-only">Workspace menu</SheetTitle>
             <SheetDescription className="sr-only">
-              Dashboard, calculator, TDS, and account
+              Dashboard, calculator, TDS, ITR, documents, calendar, CA desk, and settings
             </SheetDescription>
             <Logo href="/dashboard" />
           </SheetHeader>

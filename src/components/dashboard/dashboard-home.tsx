@@ -29,7 +29,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { formatINR } from "@/lib/money";
-import { FY_2026_27, STATUTORY_DEADLINES } from "@/lib/tax-rules";
+import { FY_2026_27 } from "@/lib/tax-rules";
+import { upcomingDeadlines } from "@/lib/calendar";
+import { formatIndianDate } from "@/lib/dates";
+import { categoryLabel } from "@/lib/documents";
 import {
   ITR_STATUSES,
   removeTds,
@@ -48,7 +51,10 @@ export function DashboardHome() {
   const [panel, setPanel] = useState<Panel>(null);
 
   const overview = useMemo(() => yearOverview(year), [year]);
-  const nextDeadlines = useMemo(() => upcomingDeadlines(user?.userType ?? "individual"), [user?.userType]);
+  const nextDeadlines = useMemo(
+    () => upcomingDeadlines(user?.userType ?? "individual", year.reminders ?? []).slice(0, 4),
+    [user?.userType, year.reminders]
+  );
 
   if (!user) return null;
 
@@ -117,15 +123,36 @@ export function DashboardHome() {
       </div>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-start gap-3">
-          <FolderClosed className="mt-0.5 size-5 text-primary" aria-hidden="true" />
-          <div>
-            <h2 className="font-heading text-lg font-medium">Recent documents</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Nothing on file yet. Upload, categorise, and download will arrive
-              in the document vault — this card will list the latest items then.
-            </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <FolderClosed className="mt-0.5 size-5 text-primary" aria-hidden="true" />
+            <div>
+              <h2 className="font-heading text-lg font-medium">Recent documents</h2>
+              {(year.documents ?? []).length === 0 ? (
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  Nothing on file yet. Add Form 16, 26AS, or a bank proof in the vault.
+                </p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {(year.documents ?? []).slice(0, 3).map((doc) => (
+                    <li key={doc.id} className="text-sm">
+                      <span className="font-medium">{doc.name}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        · {categoryLabel(doc.category)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
+          <Link
+            href="/documents"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "h-8 shrink-0")}
+          >
+            Vault
+          </Link>
         </div>
       </section>
 
@@ -135,12 +162,12 @@ export function DashboardHome() {
           <Button type="button" className="h-11 justify-start px-4" onClick={() => setPanel("estimate")}>
             <Wallet /> Record income
           </Button>
-          <Button type="button" variant="outline" className="h-11 justify-start px-4" onClick={() => setPanel("tds")}>
-            <Receipt /> Add TDS
-          </Button>
-          <Button type="button" variant="outline" className="h-11 justify-start px-4" onClick={() => setPanel("itr")}>
-            <FileText /> Update ITR status
-          </Button>
+          <Link href="/tds" className={cn(buttonVariants({ variant: "outline" }), "h-11 justify-start px-4")}>
+            <Receipt /> TDS ledger
+          </Link>
+          <Link href="/itr" className={cn(buttonVariants({ variant: "outline" }), "h-11 justify-start px-4")}>
+            <FileText /> ITR assistant
+          </Link>
           <Link
             href="/calculator"
             className={cn(buttonVariants({ variant: "outline" }), "h-11 justify-start px-4")}
@@ -165,7 +192,7 @@ export function DashboardHome() {
                 ? "Saved against this financial year and used by the estimate."
                 : panel === "tds"
                   ? "Deducted credit reduces tax still payable."
-                  : "Status only — filing assistance is a later module."}
+                  : "Update status, or open the ITR assistant to build a filing pack."}
             </SheetDescription>
           </SheetHeader>
           <div className="px-4 pb-6">
@@ -366,9 +393,15 @@ function ItrCard({
       <p className="mt-3 font-heading text-2xl">{label}</p>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         {status === "not_started"
-          ? "The return has not been started. Income and TDS on this dashboard will feed the filing assistant when it ships."
-          : "Status is stored with this year. The step-by-step filing assistant is a later module."}
+          ? "The return has not been started. Income and TDS on this dashboard feed the filing assistant."
+          : "Status is stored with this year. Continue the pack in the ITR assistant."}
       </p>
+      <Link
+        href="/itr"
+        className="mt-4 inline-block text-sm font-medium text-primary underline-offset-3 hover:underline"
+      >
+        Open ITR assistant
+      </Link>
     </article>
   );
 }
@@ -380,9 +413,14 @@ function DeadlinesCard({
 }) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2">
-        <CalendarDays className="size-4 text-primary" aria-hidden="true" />
-        <h2 className="font-heading text-lg font-medium">Upcoming deadlines</h2>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="size-4 text-primary" aria-hidden="true" />
+          <h2 className="font-heading text-lg font-medium">Upcoming deadlines</h2>
+        </div>
+        <Link href="/calendar" className="text-sm font-medium text-primary underline-offset-3 hover:underline">
+          Calendar
+        </Link>
       </div>
       <ul className="mt-4 space-y-3">
         {items.length === 0 ? (
@@ -402,7 +440,7 @@ function DeadlinesCard({
                     : "bg-primary/10 text-primary"
                 )}
               >
-                {item.overdue ? "Overdue" : formatDue(item.dueOn)}
+                {item.overdue ? "Overdue" : formatIndianDate(item.dueOn)}
               </span>
             </li>
           ))
@@ -427,23 +465,4 @@ function Row({
       <span>{value}</span>
     </div>
   );
-}
-
-function upcomingDeadlines(userType: "individual" | "small_business") {
-  const today = new Date().toISOString().slice(0, 10);
-  return STATUTORY_DEADLINES.filter(
-    (item) => item.appliesTo === "all" || item.appliesTo === userType
-  )
-    .map((item) => ({ ...item, overdue: item.dueOn < today }))
-    .sort((a, b) => a.dueOn.localeCompare(b.dueOn))
-    .filter((item) => item.overdue || item.dueOn >= today)
-    .slice(0, 4);
-}
-
-function formatDue(iso: string) {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 }

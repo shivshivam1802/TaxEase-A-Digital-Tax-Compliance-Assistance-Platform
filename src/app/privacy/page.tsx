@@ -13,8 +13,7 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy" updated="10 September 2026">
       <p>
         {site.name} is in early development. This notice describes what the
-        current product stores in your browser and how later modules are
-        intended to treat tax data.
+        current product stores in your browser.
       </p>
       <h2>Accounts</h2>
       <p>
@@ -32,8 +31,8 @@ export default function PrivacyPage() {
       </p>
       <h2>Tax year records</h2>
       <p>
-        The dashboard stores income snapshots, TDS lines, ITR status, and
-        calculator details per account in <code>niyam.tax.v1</code>. The TDS
+        The dashboard stores income snapshots, TDS lines, ITR packs, documents,
+        reminders, and CA bookings per account in <code>niyam.tax.v1</code>. The TDS
         ledger adds section, PAN, deposit status, and quarterly return markers
         to those lines. Amounts never leave this browser until a server is
         connected.

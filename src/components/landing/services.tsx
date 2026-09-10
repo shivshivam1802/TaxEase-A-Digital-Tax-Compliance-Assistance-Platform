@@ -38,8 +38,8 @@ export function Services() {
             Everything a filing year actually requires.
           </h2>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Six modules, one record. Each service below is a real product area
-            — we are shipping them one at a time, starting with this site.
+            Six modules, one record. Calculator, TDS, ITR, documents, calendar,
+            and CA desk all share the same year file once you sign in.
           </p>
         </div>
 

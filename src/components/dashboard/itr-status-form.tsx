@@ -27,8 +27,8 @@ export function ItrStatusForm({
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Track where the return stands. The guided ITR workflow ships in a later
-        module — this is status only.
+        Track where the return stands. Open the ITR assistant to build a filing pack
+        from income and TDS already on file.
       </p>
       <div className="grid gap-2">
         {ITR_STATUSES.map((option) => (

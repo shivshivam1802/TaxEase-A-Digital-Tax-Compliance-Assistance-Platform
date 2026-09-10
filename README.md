@@ -1,8 +1,8 @@
 # Niyam
 
-Niyam is a tax compliance platform for individuals and small businesses in India. It is being built **one module at a time**.
+Niyam is a tax compliance platform for individuals and small businesses in India.
 
-This repository currently ships Steps 1–5: landing page, authentication, the user dashboard, the tax calculator, and the TDS ledger.
+This repository ships the full first product slice: landing, authentication, dashboard, tax calculator, TDS ledger, ITR assistant, document vault, compliance calendar, CA desk, and settings.
 
 ## What is live
 
@@ -10,23 +10,19 @@ This repository currently ships Steps 1–5: landing page, authentication, the u
 - Sign up, sign in, forgot password, reset password (Individual or Small business)
 - Signed-in dashboard for FY 2026–27:
   - Tax overview and estimated tax from a versioned new-regime rules file
-  - TDS summary (add / delete lines)
-  - ITR status
-  - Statutory deadlines
-  - Empty document vault (upload ships later)
-  - Quick actions that open real forms
-- Tax calculator:
-  - New vs old regime comparison with a recommendation
-  - s.87A rebate, surcharge (with marginal relief), and 4% cess
-  - Old-regime 80C / 80D / HRA / housing-loan interest (capped)
-  - Save the snapshot back to the dashboard
-- TDS ledger:
-  - Credit (withheld from you) vs tax you deducted
-  - Section codes, rate helper, PAN, edit / delete
-  - Deposit due dates (7th of the next month; 30 April for March)
-  - Quarterly 26Q / 24Q status
+  - TDS summary
+  - ITR status linked to the filing assistant
+  - Upcoming statutory dates
+  - Recent documents from the vault
+- Tax calculator: new vs old regime, s.87A, surcharge, 4% cess, old-regime 80C / 80D / HRA / housing-loan
+- TDS ledger: credit vs tax you deducted, section codes, deposits, quarterly 26Q / 24Q
+- ITR assistant: form recommendation (ITR-1/2/3/4), document checklist, bank details, local filing pack (not a CPC submission)
+- Document vault: categorise, search, attach files up to 750 KB, download
+- Calendar: advance tax, ITR, TDS dates, plus personal reminders
+- CA desk: request a consultation, share/revoke this year’s file, track status
+- Settings: profile (PAN / mobile), password, JSON export, delete account
 
-The ITR assistant, document vault, calendar, CA desk, and settings are **not** built yet.
+All tax and account data stays in this browser (`niyam.users.v1`, `niyam.session.v1`, `niyam.tax.v1`).
 
 ## Run locally
 

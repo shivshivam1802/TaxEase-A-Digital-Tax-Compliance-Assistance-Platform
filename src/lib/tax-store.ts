@@ -20,6 +20,10 @@ import {
   type TdsSection,
 } from "@/lib/tds-rules";
 import { PAN_PATTERN, suggestedTds } from "@/lib/tds";
+import { emptyItrDraft, type ItrDraft } from "@/lib/itr";
+import type { VaultDocument } from "@/lib/documents";
+import type { PersonalReminder } from "@/lib/calendar";
+import type { Consultation, ConsultStatus } from "@/lib/consult";
 
 export const TAX_STORE_KEY = "niyam.tax.v1";
 export const TAX_CHANGE_EVENT = "niyam-tax-change";
@@ -43,6 +47,10 @@ export type TaxYearRecord = {
   itrUpdatedAt: string | null;
   calculator: CalculatorInput | null;
   tdsReturns: Record<TdsQuarterId, TdsReturnStatus>;
+  itrDraft: ItrDraft;
+  documents: VaultDocument[];
+  reminders: PersonalReminder[];
+  consultations: Consultation[];
   updatedAt: string;
 };
 
@@ -59,13 +67,33 @@ export function emptyYear(fyId = CURRENT_FY_ID): TaxYearRecord {
     itrUpdatedAt: null,
     calculator: null,
     tdsReturns: { ...EMPTY_TDS_RETURNS },
+    itrDraft: emptyItrDraft(),
+    documents: [],
+    reminders: [],
+    consultations: [],
     updatedAt: "",
+  };
+}
+
+export function normalizeYear(year: Partial<TaxYearRecord> & { fyId?: string }): TaxYearRecord {
+  const base = emptyYear(year.fyId ?? CURRENT_FY_ID);
+  return {
+    ...base,
+    ...year,
+    fyId: year.fyId ?? base.fyId,
+    tds: year.tds ?? base.tds,
+    tdsReturns: year.tdsReturns ?? base.tdsReturns,
+    itrDraft: year.itrDraft ?? base.itrDraft,
+    documents: year.documents ?? base.documents,
+    reminders: year.reminders ?? base.reminders,
+    consultations: year.consultations ?? base.consultations,
   };
 }
 
 export function readYear(userId: string, fyId = CURRENT_FY_ID): TaxYearRecord {
   const store = readStore();
-  return store.byUser[userId]?.[fyId] ?? emptyYear(fyId);
+  const year = store.byUser[userId]?.[fyId];
+  return year ? normalizeYear(year) : emptyYear(fyId);
 }
 
 export function saveIncome(
@@ -162,6 +190,134 @@ export function setItrStatus(
     itrStatus,
     itrUpdatedAt: new Date().toISOString(),
   }));
+}
+
+export function saveItrDraft(
+  userId: string,
+  itrDraft: ItrDraft,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({ ...year, itrDraft }));
+}
+
+export function addDocument(
+  userId: string,
+  input: Omit<VaultDocument, "id" | "createdAt">,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  const entry: VaultDocument = {
+    ...input,
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+  };
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    documents: [entry, ...year.documents],
+  }));
+}
+
+export function removeDocument(
+  userId: string,
+  documentId: string,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    documents: year.documents.filter((doc) => doc.id !== documentId),
+  }));
+}
+
+export function addReminder(
+  userId: string,
+  input: Omit<PersonalReminder, "id" | "doneOn">,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  const entry: PersonalReminder = { ...input, id: crypto.randomUUID(), doneOn: null };
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    reminders: [entry, ...year.reminders],
+  }));
+}
+
+export function setReminderDone(
+  userId: string,
+  reminderId: string,
+  done: boolean,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  const doneOn = done ? new Date().toISOString().slice(0, 10) : null;
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    reminders: year.reminders.map((item) =>
+      item.id === reminderId ? { ...item, doneOn } : item
+    ),
+  }));
+}
+
+export function removeReminder(
+  userId: string,
+  reminderId: string,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    reminders: year.reminders.filter((item) => item.id !== reminderId),
+  }));
+}
+
+export function addConsultation(
+  userId: string,
+  input: Omit<Consultation, "id" | "status" | "createdAt" | "updatedAt" | "shareFile"> & {
+    shareFile?: boolean;
+  },
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  const now = new Date().toISOString();
+  const entry: Consultation = {
+    ...input,
+    id: crypto.randomUUID(),
+    status: "requested",
+    shareFile: input.shareFile ?? false,
+    createdAt: now,
+    updatedAt: now,
+  };
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    consultations: [entry, ...year.consultations],
+  }));
+}
+
+export function updateConsultation(
+  userId: string,
+  consultationId: string,
+  patch: Partial<Pick<Consultation, "status" | "shareFile">>,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return patchYear(userId, fyId, (year) => ({
+    ...year,
+    consultations: year.consultations.map((item) =>
+      item.id === consultationId
+        ? { ...item, ...patch, updatedAt: new Date().toISOString() }
+        : item
+    ),
+  }));
+}
+
+export function setConsultStatus(
+  userId: string,
+  consultationId: string,
+  status: ConsultStatus,
+  fyId = CURRENT_FY_ID
+): TaxYearRecord {
+  return updateConsultation(userId, consultationId, { status }, fyId);
+}
+
+export function deleteUserTaxData(userId: string) {
+  const store = readStore();
+  if (!store.byUser[userId]) return;
+  const next = { ...store, byUser: { ...store.byUser } };
+  delete next.byUser[userId];
+  writeStore(next);
 }
 
 export function yearOverview(year: TaxYearRecord): {
@@ -427,7 +583,7 @@ function patchYear(
   updater: (year: TaxYearRecord) => TaxYearRecord
 ) {
   const store = readStore();
-  const current = store.byUser[userId]?.[fyId] ?? emptyYear(fyId);
+  const current = normalizeYear(store.byUser[userId]?.[fyId] ?? emptyYear(fyId));
   const next: TaxYearRecord = {
     ...updater(current),
     fyId,

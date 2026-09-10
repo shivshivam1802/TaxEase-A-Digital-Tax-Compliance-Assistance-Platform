@@ -175,3 +175,54 @@ test("sign-up, sign-in, reset, and sign-out work against local storage", async (
   assert.equal(newPassword.ok, true);
   assert.ok(storage.getItem(USERS_STORAGE_KEY));
 });
+
+test("profile update, password change, and delete account", async () => {
+  installMemoryStorage();
+  const { updateProfile, changePassword, deleteAccount } = await import("./auth");
+
+  const created = await signUp({
+    name: "Arjun Rao",
+    email: "arjun@studio.in",
+    password: "GoodPass1",
+    confirmPassword: "GoodPass1",
+    userType: "small_business",
+  });
+  assert.equal(created.ok, true);
+
+  const profile = updateProfile({
+    name: "Arjun Rao",
+    userType: "individual",
+    pan: "ABCDE1234F",
+    phone: "9876543210",
+  });
+  assert.equal(profile.ok, true);
+  if (profile.ok) {
+    assert.equal(profile.data.pan, "ABCDE1234F");
+    assert.equal(profile.data.phone, "9876543210");
+    assert.equal(profile.data.userType, "individual");
+  }
+
+  const badPan = updateProfile({
+    name: "Arjun Rao",
+    userType: "individual",
+    pan: "123",
+    phone: "",
+  });
+  assert.equal(badPan.ok, false);
+
+  const password = await changePassword({
+    currentPassword: "GoodPass1",
+    password: "FreshPass2",
+    confirmPassword: "FreshPass2",
+  });
+  assert.equal(password.ok, true);
+
+  const removed = await deleteAccount("FreshPass2");
+  assert.equal(removed.ok, true);
+
+  const login = await signIn({
+    email: "arjun@studio.in",
+    password: "FreshPass2",
+  });
+  assert.equal(login.ok, false);
+});

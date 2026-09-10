@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-
-import { AccountHome } from "@/components/auth/account-home";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Account",
-  description: "Your Niyam account session.",
+  description: "Your Niyam account has moved to Settings.",
 };
 
 export default function AccountPage() {
-  return <AccountHome />;
+  redirect("/settings");
 }
