@@ -71,7 +71,7 @@ export function SignUpForm({ initialUserType = "" }: { initialUserType?: string 
           onValueChange={(value) => setValues((current) => ({ ...current, name: value }))}
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? `${formId}-name-error` : undefined}
-          placeholder="e.g. Priya Sharma"
+          placeholder="e.g. Afnan Tufail"
           className="h-11 px-3"
         />
         {errors.name ? (

@@ -115,7 +115,7 @@ export function WaitlistForm() {
           }
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? `${formId}-name-error` : undefined}
-          placeholder="e.g. Priya Sharma"
+          placeholder="e.g. Afnan Tufail"
           className="h-11 px-3"
         />
         {errors.name ? (
