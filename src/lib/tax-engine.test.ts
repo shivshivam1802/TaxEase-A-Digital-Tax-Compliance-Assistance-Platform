@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { computeTax } from "./tax-engine";
-import { validateIncomeInput, validateTdsInput } from "./tax-store";
+import { emptyYear, validateIncomeInput, validateTdsInput } from "./tax-store";
 
 test("₹12 lakh taxable income is fully rebated under 87A", () => {
   const result = computeTax({
@@ -93,6 +93,10 @@ test("TDS validation requires amount, source, and date", () => {
     on: "",
   });
   assert.equal(result.ok, false);
+});
+
+test("empty year snapshots are stable so the dashboard store can subscribe", () => {
+  assert.equal(JSON.stringify(emptyYear()), JSON.stringify(emptyYear()));
 });
 
 test("TDS validation accepts a deducted line", () => {

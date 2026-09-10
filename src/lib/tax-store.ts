@@ -44,7 +44,7 @@ export function emptyYear(fyId = CURRENT_FY_ID): TaxYearRecord {
     tds: [],
     itrStatus: "not_started",
     itrUpdatedAt: null,
-    updatedAt: new Date().toISOString(),
+    updatedAt: "",
   };
 }
 
