@@ -28,13 +28,13 @@ export default function NotFound() {
             Back to home
           </Link>
           <Link
-            href="/#access"
+            href="/signup"
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
               "h-11 px-5"
             )}
           >
-            Request access
+            Create account
           </Link>
         </div>
       </main>

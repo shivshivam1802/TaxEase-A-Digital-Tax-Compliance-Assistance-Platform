@@ -13,15 +13,28 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy" updated="10 September 2026">
       <p>
         {site.name} is in early development. This notice describes what the
-        current landing page collects and how later modules are intended to
-        treat tax data.
+        current product stores in your browser and how later modules are
+        intended to treat tax data.
       </p>
-      <h2>Early access requests</h2>
+      <h2>Accounts</h2>
       <p>
-        The request-access form stores your name, email, and filer type
-        (individual or small business) in this browser&apos;s local storage
-        under the key <code>niyam.waitlist.v1</code>. That data does not leave
-        your device until a server is connected. Clearing site data removes it.
+        Sign-up stores your name, email, filer type (individual or small
+        business), and a salted SHA-256 password hash in this browser under{" "}
+        <code>niyam.users.v1</code>. A session pointer lives in{" "}
+        <code>niyam.session.v1</code>. Passwords are never stored in plaintext.
+        Clearing site data signs you out and deletes local accounts.
+      </p>
+      <h2>Password resets</h2>
+      <p>
+        Because this build has no mail server, a reset request writes a
+        30-minute token next to your account and shows the link on screen. In
+        production the same token would be emailed, not displayed.
+      </p>
+      <h2>Early access list</h2>
+      <p>
+        The original waitlist form, if used, stored name, email, and filer type
+        under <code>niyam.waitlist.v1</code>. That data does not leave your
+        device until a server is connected.
       </p>
       <h2>What we will not do</h2>
       <p>

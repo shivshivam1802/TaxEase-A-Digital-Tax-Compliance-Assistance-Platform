@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user, ready, signOut } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -28,6 +32,12 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  function handleSignOut() {
+    signOut();
+    setOpen(false);
+    router.push("/");
+  }
 
   return (
     <header
@@ -45,7 +55,7 @@ export function SiteHeader() {
         Skip to content
       </a>
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:h-[4.25rem] sm:px-6 lg:px-8">
-        <Logo />
+        <Logo href="/" />
 
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
@@ -59,13 +69,41 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden lg:block">
-          <Link
-            href="/#access"
-            className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
-          >
-            Request access
-          </Link>
+        <div className="hidden items-center gap-2 lg:flex">
+          {ready && user ? (
+            <>
+              <Link
+                href="/account"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-10 px-4"
+                )}
+              >
+                Account
+              </Link>
+              <Button type="button" className="h-10 px-4" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-10 px-4"
+                )}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
+              >
+                Create account
+              </Link>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
@@ -85,9 +123,9 @@ export function SiteHeader() {
             <SheetHeader>
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">
-                Jump to a section of the Niyam landing page.
+                Jump to a section or sign in to Niyam.
               </SheetDescription>
-              <Logo />
+              <Logo href="/" />
             </SheetHeader>
             <nav aria-label="Mobile" className="flex flex-col gap-1 px-4">
               {navItems.map((item) => (
@@ -105,21 +143,59 @@ export function SiteHeader() {
                 </SheetClose>
               ))}
             </nav>
-            <div className="mt-auto p-4">
-              <SheetClose
-                nativeButton={false}
-                render={
-                  <Link
-                    href="/#access"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "h-11 w-full px-4"
-                    )}
-                  />
-                }
-              >
-                Request access
-              </SheetClose>
+            <div className="mt-auto flex flex-col gap-2 p-4">
+              {ready && user ? (
+                <>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="/account"
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    Account
+                  </SheetClose>
+                  <Button type="button" className="h-11 w-full px-4" onClick={handleSignOut}>
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="/login"
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    Sign in
+                  </SheetClose>
+                  <SheetClose
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="/signup"
+                        className={cn(
+                          buttonVariants({ size: "lg" }),
+                          "h-11 w-full px-4"
+                        )}
+                      />
+                    }
+                  >
+                    Create account
+                  </SheetClose>
+                </>
+              )}
             </div>
           </SheetContent>
         </Sheet>

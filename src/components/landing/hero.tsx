@@ -35,10 +35,10 @@ export function Hero() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
-              href="/#access"
+              href="/signup"
               className={cn(buttonVariants({ size: "lg" }), "h-11 px-5")}
             >
-              Request early access
+              Create account
               <ArrowRight data-icon="inline-end" />
             </Link>
             <Link

@@ -1,11 +1,15 @@
+import { isUserType, USER_TYPES, type UserType } from "@/lib/user-type";
+import {
+  cleanPersonName,
+  normalizeEmail,
+  validateEmailAddress,
+  validatePersonName,
+} from "@/lib/validation";
+
+export { USER_TYPES, type UserType };
+export { normalizeEmail };
+
 export const WAITLIST_STORAGE_KEY = "niyam.waitlist.v1";
-
-export const USER_TYPES = [
-  { value: "individual", label: "Individual" },
-  { value: "small_business", label: "Small business" },
-] as const;
-
-export type UserType = (typeof USER_TYPES)[number]["value"];
 
 export type WaitlistEntry = {
   id: string;
@@ -22,55 +26,31 @@ export type WaitlistErrors = {
   form?: string;
 };
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}
-
 export function validateWaitlistInput(input: {
   name: string;
   email: string;
   userType: string;
 }): { ok: true; data: Omit<WaitlistEntry, "id" | "createdAt"> } | { ok: false; errors: WaitlistErrors } {
   const errors: WaitlistErrors = {};
-  const name = input.name.trim().replace(/\s+/g, " ");
-  const email = normalizeEmail(input.email);
-  const userType = input.userType;
+  const nameError = validatePersonName(input.name);
+  const emailError = validateEmailAddress(input.email);
 
-  if (!name) {
-    errors.name = "Enter your full name.";
-  } else if (name.length < 2) {
-    errors.name = "Name must be at least 2 characters.";
-  } else if (name.length > 80) {
-    errors.name = "Name must be 80 characters or fewer.";
-  } else if (!/^[\p{L}\s.'-]+$/u.test(name)) {
-    errors.name = "Use letters, spaces, hyphens, or apostrophes only.";
-  }
-
-  if (!email) {
-    errors.email = "Enter a work or personal email.";
-  } else if (!EMAIL_PATTERN.test(email) || email.length > 120) {
-    errors.email = "Enter a valid email address.";
-  }
-
-  const resolvedType: UserType | null =
-    userType === "individual" || userType === "small_business" ? userType : null;
-
-  if (!resolvedType) {
+  if (nameError) errors.name = nameError;
+  if (emailError) errors.email = emailError;
+  if (!isUserType(input.userType)) {
     errors.userType = "Choose Individual or Small business.";
   }
 
-  if (Object.keys(errors).length > 0 || !resolvedType) {
+  if (Object.keys(errors).length > 0 || !isUserType(input.userType)) {
     return { ok: false, errors };
   }
 
   return {
     ok: true,
     data: {
-      name,
-      email,
-      userType: resolvedType,
+      name: cleanPersonName(input.name),
+      email: normalizeEmail(input.email),
+      userType: input.userType,
     },
   };
 }

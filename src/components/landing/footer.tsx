@@ -40,10 +40,18 @@ export function SiteFooter() {
             ))}
             <li>
               <Link
-                href="/#access"
+                href="/signup"
                 className="text-sm text-white/75 transition-colors hover:text-white"
               >
-                Request access
+                Create account
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/login"
+                className="text-sm text-white/75 transition-colors hover:text-white"
+              >
+                Sign in
               </Link>
             </li>
           </ul>
