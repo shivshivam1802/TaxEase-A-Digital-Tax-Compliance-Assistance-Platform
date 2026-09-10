@@ -18,12 +18,8 @@ echo "$body" | grep -q -E '^Co-authored-by:' && needs_strip=1
 
 [[ "$needs_name" -eq 0 && "$needs_strip" -eq 0 ]] && exit 0
 
-clean="$(printf '%s\n' "$body" | grep -v -E '^Co-authored-by:|^Signed-off-by: Cursor|^Made-with: Cursor')"
-# Trim trailing blank lines
-clean="$(printf '%s\n' "$clean" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
-
 tmp="$(mktemp)"
-printf '%s\n' "$clean" > "$tmp"
+printf '%s\n' "$body" | grep -v -E '^Co-authored-by:|^Signed-off-by: Cursor|^Made-with: Cursor' > "$tmp"
 
 export SKIP_AUTHOR_FIX=1
 export GIT_AUTHOR_NAME="$AUTHOR_NAME"
@@ -32,7 +28,6 @@ export GIT_COMMITTER_NAME="$AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$AUTHOR_EMAIL"
 
 git -c "user.name=$AUTHOR_NAME" -c "user.email=$AUTHOR_EMAIL" \
-  commit --amend --no-verify --no-edit --file="$tmp" \
-  --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" >/dev/null
+  commit --amend --no-verify --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" --file="$tmp" >/dev/null
 
 rm -f "$tmp"
